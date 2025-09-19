@@ -1,28 +1,28 @@
-// api/uaq.js
-const fetch = require('node-fetch');
-
-module.exports = async (req, res) => {
-  // Valores de tu documento
+export default async function handler(req, res) {
+  // valores del documento (puedes ponerlos fijos o recibirlos por query)
   const numDocumento = '462985';
   const cadVerificacion = 'DGQEXJSPC';
 
   try {
-    // Hacemos POST desde Vercel a la UAQ
+    // hacemos POST al portal UAQ
     const response = await fetch('http://comunidad2.uaq.mx/validadocumento/VerificaDocumento.do', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: `numDocumento=${encodeURIComponent(numDocumento)}&cadVerificacion=${encodeURIComponent(cadVerificacion)}`
+      body: new URLSearchParams({
+        numDocumento,
+        cadVerificacion
+      }).toString()
     });
 
     const html = await response.text();
 
-    // Devolvemos el HTML tal cual
+    // devolvemos HTML al navegador
     res.setHeader('Content-Type', 'text/html; charset=ISO-8859-1');
     res.status(200).send(html);
-
   } catch (err) {
+    console.error(err);
     res.status(500).send(`Error: ${err.message}`);
   }
-};
+}
